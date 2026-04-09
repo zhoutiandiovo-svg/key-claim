@@ -1,0 +1,108 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: keys
+    description: Key draw operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /keys/draw:
+    post:
+      operationId: drawKey
+      tags: [keys]
+      summary: Draw a key
+      description: Randomly draw a key based on prize tier probability
+      responses:
+        "200":
+          description: Successfully drew a key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DrawResult"
+        "404":
+          description: No keys remaining
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /keys/stats:
+    get:
+      operationId: getKeyStats
+      tags: [keys]
+      summary: Get key statistics
+      description: Returns counts of remaining keys by prize tier
+      responses:
+        "200":
+          description: Key statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KeyStats"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    DrawResult:
+      type: object
+      properties:
+        key:
+          type: string
+        tier:
+          type: integer
+        tierName:
+          type: string
+        remaining:
+          type: integer
+      required:
+        - key
+        - tier
+        - tierName
+        - remaining
+    KeyStats:
+      type: object
+      properties:
+        tier1:
+          type: integer
+        tier2:
+          type: integer
+        tier3:
+          type: integer
+        total:
+          type: integer
+      required:
+        - tier1
+        - tier2
+        - tier3
+        - total
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
